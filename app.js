@@ -569,6 +569,7 @@ function bindEvents() {
     if (state.selectedMonths.has(month)) state.selectedMonths.delete(month);
     else state.selectedMonths.add(month);
     renderMonthChips();
+    search();
   });
   $("#applyRange").addEventListener("click", () => {
     const months = options.months.map((m) => m.value);
@@ -578,10 +579,12 @@ function bindEvents() {
     const [start, end] = a <= b ? [a, b] : [b, a];
     state.selectedMonths = new Set(months.slice(start, end + 1));
     renderMonthChips();
+    search();
   });
   $("#clearMonths").addEventListener("click", () => {
     state.selectedMonths.clear();
     renderMonthChips();
+    search();
   });
 
   ["#typeFilters", "#locationFilters", "#dayFilters", "#statusFilters"].forEach((selector) => {
@@ -595,11 +598,21 @@ function bindEvents() {
       else targetSet = state.statuses;
       if (input.checked) targetSet.add(input.value);
       else targetSet.delete(input.value);
+      search();
     });
   });
 
-  $("#keyword").addEventListener("input", (e) => { state.keyword = e.target.value; });
-  $("#keyword").addEventListener("keydown", (e) => { if (e.key === "Enter") search(); });
+  let keywordDebounce = null;
+  $("#keyword").addEventListener("input", (e) => {
+    state.keyword = e.target.value;
+    clearTimeout(keywordDebounce);
+    keywordDebounce = setTimeout(search, 300);
+  });
+  $("#keyword").addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    clearTimeout(keywordDebounce);
+    search();
+  });
   $("#spots").addEventListener("change", (e) => { state.spots = Number(e.target.value || 0); });
   $("#ageMode").addEventListener("change", (e) => { state.ageMode = e.target.value; });
   $("#addAge").addEventListener("click", () => { state.ages.push(""); renderAges(); });
