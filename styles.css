@@ -142,7 +142,7 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid #8ec5ff; ou
 
 .error-box { background: #fff1f0; border: 1px solid #ffccc7; color: #a8071a; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
 .table-wrap { overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); max-height: calc(100vh - 190px); }
-table { width: 100%; border-collapse: collapse; min-width: 980px; }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
 th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 14px; }
 th { position: sticky; top: 0; background: #f8fafc; z-index: 1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #475467; }
 tbody tr:hover { background: #f8fbff; }
@@ -160,8 +160,8 @@ tbody tr:hover { background: #f8fbff; }
 .section-desc { color: var(--muted); font-size: 13px; margin-top: 3px; }
 .activity-no { color: var(--muted); font-size: 12px; margin-top: 4px; }
 .info-link { color: var(--primary); text-decoration: none; font-weight: 600; white-space: nowrap; }
-.cost-fees { line-height: 1.35; }
-.cost-premium { color: var(--primary); font-weight: 700; white-space: nowrap; }
+.cost-fees { line-height: 1.35; display: block; }
+.cost-premium { color: var(--primary); font-weight: 700; display: block; margin-top: 2px; }
 .empty { padding: 28px; text-align: center; color: var(--muted); background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; }
 
 .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; }
@@ -188,4 +188,11 @@ tbody tr:hover { background: #f8fbff; }
   .range-row { grid-template-columns: 1fr; }
   .check-list.compact, .check-list.days, .check-list.statuses { grid-template-columns: 1fr; }
   .control-actions { grid-template-columns: 1fr; }
-}
+  table#resultsTable { min-width: 0; }
+  #resultsTable thead { display: none; }
+  #resultsTable, #resultsTable tbody, #resultsTable tr, #resultsTable td { display: block; width: 100%; box-sizing: border-box; }
+  #resultsTable tr { border-bottom: 2px solid var(--line); padding: 8px 2px; }
+  #resultsTable td { border-bottom: 0; padding: 3px 8px; font-size: 13px; }
+  #resultsTable td[data-h]::before { content: attr(data-h) ": "; font-weight: 700; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .table-wrap { max-height: none; }
+  }
