@@ -3,6 +3,7 @@ const $ = (selector) => document.querySelector(selector);
 const state = {
   selectedMonths: new Set(),
   types: new Set(),
+  excludedTypes: new Set(),
   locations: new Set(),
   days: new Set(),
   statuses: new Set(),
@@ -103,6 +104,7 @@ function snapshotState() {
   return {
     months: Array.from(state.selectedMonths).sort(),
     types: Array.from(state.types).sort(),
+    excludedTypes: Array.from(state.excludedTypes).sort(),
     locations: Array.from(state.locations).sort(),
     days: Array.from(state.days).sort(),
     statuses: Array.from(state.statuses).sort(),
@@ -154,8 +156,25 @@ function renderChecks(containerId, items, selectedSet, valueFn, labelFn) {
     .join("");
 }
 
+function renderTypeControls() {
+  const container = $("#typeFilters");
+  container.innerHTML = options.types
+    .map((type) => {
+      const included = state.types.has(type);
+      const excluded = state.excludedTypes.has(type);
+      return `<div class="type-control">
+        <span class="type-name">${esc(type)}</span>
+        <span class="seg" role="group" aria-label="${esc(type)} include or exclude">
+          <button type="button" class="seg-btn ${included ? "active-include" : ""}" data-type="${esc(type)}" data-mode="include" aria-pressed="${included}">In</button>
+          <button type="button" class="seg-btn ${excluded ? "active-exclude" : ""}" data-type="${esc(type)}" data-mode="exclude" aria-pressed="${excluded}">Out</button>
+        </span>
+      </div>`;
+    })
+    .join("");
+}
+
 function renderAllControls() {
-  renderChecks("#typeFilters", options.types, state.types, (v) => v, (v) => v);
+  renderTypeControls();
   renderChecks("#locationFilters", options.locations, state.locations, (v) => v.value, (v) => v.label);
   renderChecks("#dayFilters", options.days, state.days, (v) => v, (v) => v);
   renderChecks("#statusFilters", options.statuses, state.statuses, (v) => v, (v) => v[0].toUpperCase() + v.slice(1));
@@ -194,6 +213,7 @@ function renderAges() {
 function applySnapshot(snap) {
   state.selectedMonths = new Set(snap.months || []);
   state.types = new Set(snap.types || []);
+  state.excludedTypes = new Set(Array.isArray(snap.excludedTypes) ? snap.excludedTypes : []);
   state.locations = new Set(snap.locations || []);
   state.days = new Set(snap.days || []);
   state.statuses = new Set(snap.statuses && snap.statuses.length ? snap.statuses : options.defaultStatuses);
@@ -314,6 +334,7 @@ function filterSections(months) {
   const defaultStatuses = new Set(options.defaultStatuses || []);
   const statuses = state.statuses.size ? state.statuses : defaultStatuses;
   const types = Array.from(state.types);
+  const excludedTypes = Array.from(state.excludedTypes);
   const days = Array.from(state.days);
   const ages = state.ages.map((a) => String(a || "").trim()).filter(Boolean);
   const keyword = state.keyword.trim();
@@ -325,10 +346,9 @@ function filterSections(months) {
     const status = String(sec.status || "unknown").toLowerCase();
     if (statuses.size && !statuses.has(status)) return false;
 
-    if (types.length) {
-      const secTypes = Array.isArray(sec.types) ? sec.types : [];
-      if (!secTypes.some((type) => types.includes(type))) return false;
-    }
+    const secTypes = Array.isArray(sec.types) ? sec.types : [];
+    if (types.length && !secTypes.some((type) => types.includes(type))) return false;
+    if (excludedTypes.length && secTypes.some((type) => excludedTypes.includes(type))) return false;
 
     if (!matchesLocations(sec)) return false;
 
@@ -550,6 +570,7 @@ function openCompare() {
 function resetControls() {
   setDefaultMonths();
   state.types.clear();
+  state.excludedTypes.clear();
   state.locations.clear();
   state.days.clear();
   state.statuses = new Set(options.defaultStatuses);
@@ -587,19 +608,42 @@ function bindEvents() {
     search();
   });
 
-  ["#typeFilters", "#locationFilters", "#dayFilters", "#statusFilters"].forEach((selector) => {
+  ["#locationFilters", "#dayFilters", "#statusFilters"].forEach((selector) => {
     $(selector).addEventListener("change", (e) => {
       const input = e.target.closest("input[type=checkbox]");
       if (!input) return;
       let targetSet;
-      if (selector === "#typeFilters") targetSet = state.types;
-      else if (selector === "#locationFilters") targetSet = state.locations;
+      if (selector === "#locationFilters") targetSet = state.locations;
       else if (selector === "#dayFilters") targetSet = state.days;
       else targetSet = state.statuses;
       if (input.checked) targetSet.add(input.value);
       else targetSet.delete(input.value);
       search();
     });
+  });
+
+  $("#typeFilters").addEventListener("click", (e) => {
+    const btn = e.target.closest(".seg-btn");
+    if (!btn) return;
+    const type = btn.dataset.type;
+    const mode = btn.dataset.mode;
+    if (mode === "include") {
+      if (state.types.has(type)) state.types.delete(type);
+      else {
+        state.types.add(type);
+        state.excludedTypes.delete(type);
+      }
+    } else if (mode === "exclude") {
+      if (state.excludedTypes.has(type)) state.excludedTypes.delete(type);
+      else {
+        state.excludedTypes.add(type);
+        state.types.delete(type);
+      }
+    } else {
+      return;
+    }
+    renderTypeControls();
+    search();
   });
 
   let keywordDebounce = null;

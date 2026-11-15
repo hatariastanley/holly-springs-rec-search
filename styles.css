@@ -107,6 +107,23 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid #8ec5ff; ou
 .check-list label { display: flex; align-items: center; gap: 7px; font-size: 13px; }
 .check-list input { margin: 0; }
 
+.type-control { display: flex; align-items: center; gap: 8px; padding: 3px 2px; min-width: 0; }
+.type-name { flex: 1 1 auto; min-width: 0; font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
+.seg { display: inline-flex; gap: 4px; flex: 0 0 auto; }
+.seg-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 38px;
+}
+.seg-btn.active-include { background: #e8f3ff; border-color: #9ec7ef; color: #0b5a9d; }
+.seg-btn.active-exclude { background: #fdecec; border-color: #f0b4b4; color: #8f1d1d; }
+
 .age-rows { display: grid; gap: 6px; margin-bottom: 8px; }
 .age-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; }
 .age-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
