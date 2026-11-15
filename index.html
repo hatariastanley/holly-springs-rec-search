@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Holly Springs Recreation Search</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Holly Springs Recreation Search</h1>
+      <p class="subtitle">Static snapshot of the public recreation portal · read-only · no login · no enrollment actions</p>
+    </div>
+    <div class="topbar-actions">
+      <a class="portal-link" href="#" id="portalLink" target="_blank" rel="noopener">Open official portal</a>
+    </div>
+  </header>
+  <div class="freshness-bar" id="dataFreshness" hidden></div>
+
+  <main class="layout">
+    <aside class="panel controls" aria-label="Search controls">
+      <section class="control-block">
+        <div class="block-head">
+          <h2>Months</h2>
+          <span class="hint">Pick individual months or a range</span>
+        </div>
+        <div class="range-row">
+          <label>From <select id="rangeStart"></select></label>
+          <label>To <select id="rangeEnd"></select></label>
+          <button type="button" id="applyRange" class="btn secondary">Set range</button>
+          <button type="button" id="clearMonths" class="btn ghost">Clear</button>
+        </div>
+        <div id="monthChips" class="chip-grid"></div>
+      </section>
+
+      <section class="control-block">
+        <div class="block-head"><h2>Filters</h2></div>
+        <div class="field">
+          <label for="keyword">Keyword</label>
+          <input id="keyword" type="search" placeholder="e.g. pickleball, art, camp">
+        </div>
+
+        <div class="field">
+          <label>Activity type</label>
+          <div id="typeFilters" class="check-list compact"></div>
+        </div>
+
+        <div class="field">
+          <label>Location</label>
+          <div id="locationFilters" class="check-list compact"></div>
+        </div>
+
+        <div class="field">
+          <label>Days of week <span class="hint">any selected day matches</span></label>
+          <div id="dayFilters" class="check-list days"></div>
+        </div>
+
+        <div class="field">
+          <label for="spots">Minimum spots available</label>
+          <select id="spots">
+            <option value="0">Any / N/A</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5+</option>
+            <option value="6">6+</option>
+            <option value="7">7+</option>
+            <option value="8">8+</option>
+            <option value="9">9+</option>
+            <option value="10">10+</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Ages <span class="hint">enter ages yourself</span></label>
+          <div id="ageRows" class="age-rows"></div>
+          <div class="age-controls">
+            <button type="button" id="addAge" class="btn secondary small">Add person</button>
+            <label class="age-mode">Match
+              <select id="ageMode">
+                <option value="all">all ages fit</option>
+                <option value="any">any age fits</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <div id="statusFilters" class="check-list statuses"></div>
+        </div>
+      </section>
+
+      <section class="control-block presets">
+        <div class="block-head"><h2>Presets</h2></div>
+        <div class="preset-row">
+          <input id="presetName" type="text" placeholder="Preset name">
+          <button type="button" id="savePreset" class="btn secondary">Save</button>
+        </div>
+        <div class="preset-row">
+          <select id="presetSelect"></select>
+          <button type="button" id="loadPreset" class="btn ghost">Load</button>
+          <button type="button" id="deletePreset" class="btn ghost danger">Delete</button>
+        </div>
+        <p class="hint">Presets are stored only in this browser and include your entered ages.</p>
+      </section>
+
+      <div class="control-actions">
+        <button type="button" id="searchBtn" class="btn primary">Search</button>
+        <button type="button" id="clearFilters" class="btn ghost">Reset filters</button>
+      </div>
+      <p id="statusLine" class="status-line" role="status"></p>
+    </aside>
+
+    <section class="results" aria-label="Search results">
+      <div class="results-head">
+        <div>
+          <h2 id="resultTitle">Sections</h2>
+          <p id="resultMeta" class="muted"></p>
+        </div>
+        <div class="results-actions">
+          <button type="button" id="shortlistBtn" class="btn secondary">Shortlist (<span id="shortlistCount">0</span>)</button>
+          <button type="button" id="compareBtn" class="btn primary" disabled>Compare shortlist</button>
+        </div>
+      </div>
+      <div id="errorBox" class="error-box" hidden></div>
+      <div class="table-wrap">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th class="col-star"></th>
+              <th>Status</th>
+              <th>Program / Section</th>
+              <th>Dates</th>
+              <th>Times</th>
+              <th>Days</th>
+              <th>Location</th>
+              <th>Ages</th>
+              <th>Cost</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <p id="emptyState" class="empty" hidden>No sections match the current filters.</p>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="modalTitle">Shortlist</h2>
+        <button type="button" id="modalClose" class="btn ghost">Close</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
