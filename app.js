@@ -7,7 +7,7 @@ const state = {
   days: new Set(),
   statuses: new Set(),
   ages: [""],
-  ageMode: "all"
+  ageMode: "all",
   keyword: "",
   spots: 0,
   results: [],
