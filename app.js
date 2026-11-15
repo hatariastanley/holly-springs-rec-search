@@ -431,18 +431,18 @@ function renderResults() {
     const activity = sec.activityNumber ? `<div class="activity-no">Activity # ${esc(sec.activityNumber)}</div>` : "";
     return `<tr>
       <td><button type="button" class="star-btn ${active ? "active" : ""}" data-key="${esc(key)}" aria-label="${active ? "Remove from shortlist" : "Add to shortlist"}">${active ? "★" : "☆"}</button></td>
-      <td>${statusBadge(sec.status)}</td>
+      <td data-h="Status">${statusBadge(sec.status)}</td>
       <td>
         <div class="program-name">${esc(sec.programName || "Untitled program")}</div>
         ${desc ? `<div class="section-desc">${esc(desc)}</div>` : ""}
         ${activity}
       </td>
-      <td>${esc(formatDateRange(sec))}</td>
-      <td>${esc(sec.timesDisplay || "—")}</td>
-      <td>${esc(sec.daysDisplay || (sec.days || []).join(", ") || "—")}</td>
-      <td>${esc(sec.location || "—")}</td>
-      <td>${esc(sec.agesDisplay || "—")}</td>
-      <td>${formatCost(sec)}</td>
+      <td data-h="Dates">${esc(formatDateRange(sec))}</td>
+      <td data-h="Times">${esc(sec.timesDisplay || "—")}</td>
+      <td data-h="Days">${esc(sec.daysDisplay || (sec.days || []).join(", ") || "—")}</td>
+      <td data-h="Location">${esc(sec.location || "—")}</td>
+      <td data-h="Ages">${esc(sec.agesDisplay || "—")}</td>
+      <td data-h="Cost">${formatCost(sec)}</td>
       <td>${sec.infoUrl ? `<a class="info-link" href="${esc(sec.infoUrl)}" target="_blank" rel="noopener">Details</a>` : "—"}</td>
     </tr>`;
   });
@@ -647,7 +647,7 @@ function formatGeneratedAt(value) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-  return date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  return date.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
 }
 
 function setFreshness() {
