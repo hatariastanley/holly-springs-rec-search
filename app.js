@@ -388,6 +388,34 @@ function statusBadge(status) {
   return `<span class="badge ${esc(value)}">${esc(value === "open" ? "Open" : value)}</span>`;
 }
 
+function moneyNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function formatCost(sec) {
+  const display = String(sec.costDisplay || "").trim();
+  if (!display) return "—";
+  const parts = display.split("/");
+  const likeForLike = parts.length === 2 && parts.every((part) => /^\$\d[\d,]*(?:\.\d+)?$/.test(part.trim()));
+  const displayNums = likeForLike ? parts.map((part) => Number(part.trim().replace(/[$,]/g, ""))) : [];
+  const values = Array.isArray(sec.costValues) && sec.costValues.length === 2 ? sec.costValues.map(moneyNumber) : [null, null];
+  const aligned = values[0] != null && values[1] != null && displayNums.length === 2 &&
+    Math.abs(values[0] - displayNums[0]) < 0.011 && Math.abs(values[1] - displayNums[1]) < 0.011;
+  if (!likeForLike || !aligned) return esc(display);
+
+  const resident = values[0];
+  const nonresident = values[1];
+  const feeLine = `<span class="cost-fees">Resident ${esc(parts[0].trim())} · Non-resident ${esc(parts[1].trim())}</span>`;
+  if (resident > 0 && nonresident > 0 && nonresident >= resident) {
+    const pct = ((nonresident - resident) / resident) * 100;
+    const rounded = Math.round(pct * 10) / 10;
+    const pctText = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+    return `${feeLine} <span class="cost-premium">non-resident premium +${esc(pctText)}%</span>`;
+  }
+  return feeLine;
+}
+
 function renderResults() {
   const body = $("#resultsBody");
   const count = state.results.length;
@@ -414,7 +442,7 @@ function renderResults() {
       <td>${esc(sec.daysDisplay || (sec.days || []).join(", ") || "—")}</td>
       <td>${esc(sec.location || "—")}</td>
       <td>${esc(sec.agesDisplay || "—")}</td>
-      <td>${esc(sec.costDisplay || "—")}</td>
+      <td>${formatCost(sec)}</td>
       <td>${sec.infoUrl ? `<a class="info-link" href="${esc(sec.infoUrl)}" target="_blank" rel="noopener">Details</a>` : "—"}</td>
     </tr>`;
   });
@@ -491,7 +519,7 @@ function renderCompare() {
     ["Days", (s) => esc(s.daysDisplay || (s.days || []).join(", ") || "—")],
     ["Location", (s) => esc(s.location || "—")],
     ["Ages", (s) => esc(s.agesDisplay || "—")],
-    ["Cost", (s) => esc(s.costDisplay || "—")],
+    ["Cost", (s) => formatCost(s)],
     ["Program", (s) => esc(s.programName || "—")],
     ["Section", (s) => esc(s.description || "—")],
     ["Info", (s) => s.infoUrl ? `<a class="info-link" href="${esc(s.infoUrl)}" target="_blank" rel="noopener">Portal details</a>` : "—"],

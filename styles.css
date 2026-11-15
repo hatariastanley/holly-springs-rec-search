@@ -160,6 +160,8 @@ tbody tr:hover { background: #f8fbff; }
 .section-desc { color: var(--muted); font-size: 13px; margin-top: 3px; }
 .activity-no { color: var(--muted); font-size: 12px; margin-top: 4px; }
 .info-link { color: var(--primary); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.cost-fees { line-height: 1.35; }
+.cost-premium { color: var(--primary); font-weight: 700; white-space: nowrap; }
 .empty { padding: 28px; text-align: center; color: var(--muted); background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; }
 
 .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; }
