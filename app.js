@@ -329,6 +329,15 @@ function sortSections(a, b) {
   return 0;
 }
 
+function effectiveTypes(sec) {
+  const types = Array.isArray(sec.types) ? sec.types.slice() : [];
+  const name = String(sec.programName || "");
+  if (/^\s*after\s+school\s+care\b/i.test(name) && !types.includes("After School")) {
+    types.push("After School");
+  }
+  return types;
+}
+
 function filterSections(months) {
   const selectedMonths = Array.isArray(months) ? months.slice().sort() : Array.from(state.selectedMonths).sort();
   const defaultStatuses = new Set(options.defaultStatuses || []);
@@ -346,7 +355,7 @@ function filterSections(months) {
     const status = String(sec.status || "unknown").toLowerCase();
     if (statuses.size && !statuses.has(status)) return false;
 
-    const secTypes = Array.isArray(sec.types) ? sec.types : [];
+    const secTypes = effectiveTypes(sec);
     if (types.length && !secTypes.some((type) => types.includes(type))) return false;
     if (excludedTypes.length && secTypes.some((type) => excludedTypes.includes(type))) return false;
 
