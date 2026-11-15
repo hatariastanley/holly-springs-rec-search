@@ -645,7 +645,8 @@ function bindEvents() {
 
 function formatGeneratedAt(value) {
   if (!value) return "";
-  const date = new Date(value);
+  const hasZone = /Z$|[+-]\d{2}:?\d{2}$/.test(value);
+  const date = new Date(hasZone ? value : value + "Z");
   if (Number.isNaN(date.getTime())) return String(value);
   return date.toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
 }
